@@ -46,6 +46,10 @@ class Board {
         this.board[x][y].alive = isAlive;
     }
 
+    switchCellState(x, y) {
+        this.board[x][y].alive = !this.board[x][y].alive;
+    }
+
     getCell(x, y) {
         return this.board[x][y];
     }
@@ -67,7 +71,7 @@ class Board {
 
     onClick(event) {
         const clickCoords = this.transformClickToCellCoords(event.offsetX, event.offsetY);
-        this.setCellState(clickCoords.x, clickCoords.y, true);
+        this.switchCellState(clickCoords.x, clickCoords.y);
     }
 }
 
@@ -81,6 +85,7 @@ function draw() {
     board.setCellState(15, 15, true);
 
     setInterval(() => {
+        ctx.clearRect(0, 0, 300, 300);
         board.drawBoard(ctx);
     }, 33);
 }
