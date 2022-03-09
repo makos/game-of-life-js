@@ -1,3 +1,6 @@
+/* eslint-disable no-unused-vars */
+'use strict';
+
 class Cell {
     constructor(x, y, alive) {
         this.x = x;
@@ -5,12 +8,12 @@ class Cell {
         this.alive = alive;
     }
 
-    draw(ctx) {
+    draw(ctx, cellSize) {
         if (this.alive) {
-            ctx.fillStyle = "black"; 
-            ctx.fillRect(this.x, this.y, CELLSIZE, CELLSIZE);
+            ctx.fillStyle = 'black'; 
+            ctx.fillRect(this.x, this.y, cellSize, cellSize);
         } else {
-            ctx.strokeRect(this.x, this.y, CELLSIZE, CELLSIZE);
+            ctx.strokeRect(this.x, this.y, cellSize, cellSize);
         }
     }
 }
@@ -21,8 +24,8 @@ class Board {
         this.maxX = maxX;
         this.maxY = maxY;
         this.cellSize = cellSize;
-        this.numCellsX = this.maxX / this.cellsize;
-        this.numCellsY = this.maxY / this.cellsize;
+        this.numCellsX = this.maxX / this.cellSize;
+        this.numCellsY = this.maxY / this.cellSize;
 
         for (let i = 0; i < this.numCellsX; i++) {
             let tempX = [];
@@ -31,6 +34,8 @@ class Board {
             }
             this.board.push(tempX);
         }
+
+        this.onClick = this.onClick.bind(this);
     }
 
     isCellAlive(x, y) {
@@ -48,18 +53,34 @@ class Board {
     drawBoard(ctx) {
         for (let i = 0; i < this.numCellsX; i++) {
             for (let j = 0; j < this.numCellsY; j++) {
-                this.board[i][j].draw(ctx);
+                this.board[i][j].draw(ctx, this.cellSize);
             }
         }
+    }
+
+    transformClickToCellCoords(clickX, clickY) {
+        return {
+            x: Math.floor(clickX / this.cellSize), 
+            y: Math.floor(clickY / this.cellSize)
+        }
+    }
+
+    onClick(event) {
+        const clickCoords = this.transformClickToCellCoords(event.offsetX, event.offsetY);
+        this.setCellState(clickCoords.x, clickCoords.y, true);
     }
 }
 
 function draw() {
-    const canvas = document.getElementById("tutorial");
+    const canvas = document.getElementById('tutorial');
     const ctx = canvas.getContext('2d');
 
     const board = new Board(300, 300, 10);
+    canvas.addEventListener('click', board.onClick);
 
     board.setCellState(15, 15, true);
-    board.drawBoard(ctx);
+
+    setInterval(() => {
+        board.drawBoard(ctx);
+    }, 33);
 }
