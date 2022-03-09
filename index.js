@@ -76,7 +76,7 @@ class Board {
 }
 
 function draw() {
-    const canvas = document.getElementById('tutorial');
+    const canvas = document.getElementById('game');
     const ctx = canvas.getContext('2d');
 
     const board = new Board(300, 300, 10);
