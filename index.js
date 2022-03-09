@@ -6,6 +6,7 @@ class Cell {
         this.x = x;
         this.y = y;
         this.alive = alive;
+        this.shouldSwitchState = false;
     }
 
     draw(ctx, cellSize) {
@@ -16,16 +17,28 @@ class Cell {
             ctx.strokeRect(this.x, this.y, cellSize, cellSize);
         }
     }
+
+    flagForStateSwitch() {
+        this.shouldSwitchState = true;
+    }
+
+    applySwitchFlag() {
+        if (this.shouldSwitchState) {
+            this.alive = !this.alive;
+        }
+        this.shouldSwitchState = false;
+    }
 }
 
 class Board {
-    constructor(maxX, maxY, cellSize) {
+    constructor(maxX, maxY, cellSize, ctx) {
         this.board = [];
         this.maxX = maxX;
         this.maxY = maxY;
         this.cellSize = cellSize;
         this.numCellsX = this.maxX / this.cellSize;
         this.numCellsY = this.maxY / this.cellSize;
+        this.ctx = ctx;
 
         for (let i = 0; i < this.numCellsX; i++) {
             let tempX = [];
@@ -42,22 +55,19 @@ class Board {
         return this.board[x][y].alive;
     }
 
-    setCellState(x, y, isAlive) {
-        this.board[x][y].alive = isAlive;
-    }
-
     switchCellState(x, y) {
-        this.board[x][y].alive = !this.board[x][y].alive;
+        this.getCell(x, y).flagForStateSwitch();
     }
 
     getCell(x, y) {
         return this.board[x][y];
     }
 
-    drawBoard(ctx) {
+    drawBoard() {
         for (let i = 0; i < this.numCellsX; i++) {
             for (let j = 0; j < this.numCellsY; j++) {
-                this.board[i][j].draw(ctx, this.cellSize);
+                this.getCell(i, j).applySwitchFlag();
+                this.getCell(i, j).draw(this.ctx, this.cellSize);
             }
         }
     }
@@ -73,19 +83,28 @@ class Board {
         const clickCoords = this.transformClickToCellCoords(event.offsetX, event.offsetY);
         this.switchCellState(clickCoords.x, clickCoords.y);
     }
+
+    /*  TODO: Game of Life rules.
+        The cells are flagged for state change accordingly, and actually switched 
+        only after iterating over the board array. 
+        1. Any live cell with fewer than two neighbors dies.
+        2. Any live cell with two or three live neighbors continues to live.
+        3. Any live cell with more than three neighbors dies.
+        4. Any dead cell with exactly three neighbors becomes alive. */
+    // tick() {
+    //     const newBoard = 
+    // }
 }
 
 function draw() {
     const canvas = document.getElementById('game');
     const ctx = canvas.getContext('2d');
 
-    const board = new Board(300, 300, 10);
+    const board = new Board(300, 300, 10, ctx);
     canvas.addEventListener('click', board.onClick);
-
-    board.setCellState(15, 15, true);
 
     setInterval(() => {
         ctx.clearRect(0, 0, 300, 300);
-        board.drawBoard(ctx);
+        board.drawBoard();
     }, 33);
 }
