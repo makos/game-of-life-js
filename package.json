@@ -1,0 +1,14 @@
+{
+  "name": "game-of-life",
+  "version": "1.0.0",
+  "description": "Game of Life in JS using Canvas",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "makos",
+  "license": "MIT",
+  "devDependencies": {
+    "eslint": "^8.10.0"
+  }
+}
