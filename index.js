@@ -1,4 +1,13 @@
 /* eslint-disable no-unused-vars */
+/* 
+ * Game of Life implementation in JavaScript, using Canvas API.
+ * Copyright (c) 2022 Mateusz Makowski <makos>
+ * MIT License <https://mit-license.org/>
+ * 
+ * TODO:
+ * - ability to reset the board
+ * - arbitrary board size setting (input from HTML file)
+ * */
 'use strict';
 
 class Cell {
@@ -51,7 +60,6 @@ class Board {
         }
 
         this.onClick = this.onClick.bind(this);
-        this.onKeyPauseEvent = this.onKeyPauseEvent.bind(this);
         this.onMousePauseEvent = this.onMousePauseEvent.bind(this);
     }
 
@@ -103,26 +111,23 @@ class Board {
         }
     }
 
-    onKeyPauseEvent(event) {
-        if (event.code === 'Space') {
-            this.isPaused = !this.isPaused;
-            this.adjustUpdateTime();
+    update(updateTime) {
+        if (updateTime) {
+            this.updateTime = updateTime;
         }
-    }
 
-    update() {
         this.drawBoard();
         this.tick();
     }
 
-    /*  TODO: Game of Life rules.
-     *  The cells are flagged for state change accordingly, and actually switched 
-     *  only after iterating over the board array. 
-     *  1. Any live cell with fewer than two neighbors dies.
-     *  2. Any live cell with two or three live neighbors continues to live.
-     *  3. Any live cell with more than three neighbors dies.
-     *  4. Any dead cell with exactly three neighbors becomes alive.
-     */
+    /*  
+     * The cells are flagged for state change accordingly, and actually switched
+     * only after iterating over the board array. 
+     * 1. Any live cell with fewer than two neighbors dies.
+     * 2. Any live cell with two or three live neighbors continues to live.
+     * 3. Any live cell with more than three neighbors dies.
+     * 4. Any dead cell with exactly three neighbors becomes alive.
+     * */
     tick() {
         if (this.isPaused) {
             return;
@@ -156,13 +161,11 @@ class Board {
 
 function draw() {
     const canvas = document.getElementById('game');
-    const body = document.getElementById('main-body');
     const pauseButton = document.getElementById('pause-button');
     const ctx = canvas.getContext('2d');
 
     const board = new Board(300, 300, 10, ctx);
     canvas.addEventListener('click', board.onClick);
-    // body.addEventListener('keyup', board.onKeyPauseEvent);
     pauseButton.addEventListener('click', board.onMousePauseEvent);
 
     board.update();
@@ -172,7 +175,12 @@ function draw() {
 
 function play(ctx, board) {
     ctx.clearRect(0, 0, 300, 300);
-    board.update();
+
+    const timeSlider = document.getElementById('update-time');
+    const sliderDisplay = document.getElementById('update-time-display');
+    sliderDisplay.value = timeSlider.value;
+
+    board.update(sliderDisplay.value);
 
     setTimeout(() => play(ctx, board), board.updateTime);
 }
