@@ -13,7 +13,18 @@
     </style>
 </head>
 <body id="main-body" onload="draw();">
-    <canvas id="game" width="300" height="300"></canvas>
-    <button id="pause-button">Pause / Play</button>
+    <div>
+        <canvas id="game" width="300" height="300"></canvas>
+    </div>
+    <div>
+        <div>
+            <button id="pause-button">Pause / Play</button>
+        </div>
+        <div>
+            <label for="update-time" title="In milliseconds; how long each tick takes">Timestep</label>
+            <input type="range" name="update-time" min="10" max="1000" step="10" value="100" id="update-time">
+            <input type="text" id="update-time-display" value="100">
+        </div>
+    </div>
 </body>
 </html>
