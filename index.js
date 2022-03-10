@@ -51,7 +51,8 @@ class Board {
         }
 
         this.onClick = this.onClick.bind(this);
-        this.onKeyup = this.onKeyup.bind(this);
+        this.onKeyPauseEvent = this.onKeyPauseEvent.bind(this);
+        this.onMousePauseEvent = this.onMousePauseEvent.bind(this);
     }
 
     isCellAlive(x, y) {
@@ -87,16 +88,25 @@ class Board {
         this.switchCellState(clickCoords.x, clickCoords.y);
     }
 
-    onKeyup(event) {
+    onMousePauseEvent(event) {
+        this.isPaused = !this.isPaused;
+        this.adjustUpdateTime();
+    }
+
+    adjustUpdateTime() {
+        if (this.isPaused) {
+            console.log('Pausing');
+            this.updateTime = 100;
+        } else {
+            console.log('Unpausing');
+            this.updateTime = 1000;
+        }
+    }
+
+    onKeyPauseEvent(event) {
         if (event.code === 'Space') {
             this.isPaused = !this.isPaused;
-            if (this.isPaused) {
-                console.log('Pausing');
-                this.updateTime = 100;
-            } else {
-                console.log('Unpausing');
-                this.updateTime = 1000;
-            }
+            this.adjustUpdateTime();
         }
     }
 
@@ -147,11 +157,13 @@ class Board {
 function draw() {
     const canvas = document.getElementById('game');
     const body = document.getElementById('main-body');
+    const pauseButton = document.getElementById('pause-button');
     const ctx = canvas.getContext('2d');
 
     const board = new Board(300, 300, 10, ctx);
     canvas.addEventListener('click', board.onClick);
-    body.addEventListener('keyup', board.onKeyup);
+    // body.addEventListener('keyup', board.onKeyPauseEvent);
+    pauseButton.addEventListener('click', board.onMousePauseEvent);
 
     board.update();
 
